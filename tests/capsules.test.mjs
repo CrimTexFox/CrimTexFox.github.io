@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {capsuleContact,stepCapsules} from '../dist/capsule-physics.js';
+import {capsuleContact,stepCapsules,SkillMotionState,releaseVelocity} from '../dist/capsule-physics.js';
 const capsule=(x,y,width=100)=>({x,y,homeX:x,homeY:y,width,height:44,vx:0,vy:0,mass:1,phase:0,dragged:false});
 test('capsule collisions follow the rounded ends rather than a rectangular bounding box',()=>{
   const a=capsule(100,100),b=capsule(200,142);
@@ -24,5 +24,27 @@ test('high-speed releases remain inside the invisible container',()=>{
 test('capsules dragged past each other can route around a blocked return path',()=>{
   const a=capsule(150,90),b=capsule(150,160);a.y=160;b.y=90;
   for(let i=0;i<2400;i++)stepCapsules([a,b],1/120,{width:500,height:300,reducedMotion:true});
+  for(const p of [a,b]){assert.ok(Math.abs(p.x-p.homeX)<.5);assert.ok(Math.abs(p.y-p.homeY)<.5);}
+});
+test('all skills wait three seconds after the latest release before returning',()=>{
+  const motion=new SkillMotionState();assert.equal(motion.shouldReturn(0),true);
+  motion.beginDrag();assert.equal(motion.shouldReturn(100000),false);
+  motion.release(1000);assert.equal(motion.shouldReturn(3999),false);assert.equal(motion.shouldReturn(4000),true);
+  motion.beginDrag();assert.equal(motion.shouldReturn(20000),false);
+  motion.release(20000);assert.equal(motion.shouldReturn(22999),false);assert.equal(motion.shouldReturn(23000),true);
+});
+test('release retains fresh throwing velocity and ignores a stale movement sample',()=>{
+  assert.equal(releaseVelocity(600,20),600);assert.ok(releaseVelocity(600,1000)<.1);
+});
+test('free drift transfers momentum to neighbors without pulling them toward home',()=>{
+  const a=capsule(120,100),b=capsule(300,100);a.vx=450;
+  for(let i=0;i<120;i++)stepCapsules([a,b],1/120,{width:1600,height:300,returnToGrid:false});
+  assert.ok(b.x>b.homeX+100);assert.ok(b.vx>100);assert.ok(a.x>a.homeX+100);
+});
+test('the whole group begins returning together after its shared drift window',()=>{
+  const a=capsule(120,100),b=capsule(300,100),motion=new SkillMotionState();a.vx=450;motion.release(0);
+  for(let frame=0;frame<360;frame++)stepCapsules([a,b],1/120,{width:1600,height:300,reducedMotion:true,returnToGrid:motion.shouldReturn(frame/120*1000)});
+  assert.ok(a.x>a.homeX+100&&b.x>b.homeX+100);
+  for(let frame=360;frame<2160;frame++)stepCapsules([a,b],1/120,{width:1600,height:300,reducedMotion:true,returnToGrid:motion.shouldReturn(frame/120*1000)});
   for(const p of [a,b]){assert.ok(Math.abs(p.x-p.homeX)<.5);assert.ok(Math.abs(p.y-p.homeY)<.5);}
 });

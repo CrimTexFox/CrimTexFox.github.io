@@ -1,4 +1,4 @@
-import {containCapsule,stepCapsules} from './capsule-physics.js';
+import {containCapsule,stepCapsules,SkillMotionState,releaseVelocity} from './capsule-physics.js?v=20261103-skills-drift';
 export class SkillCapsule {
   constructor(data,index,container){
     this.data=data;this.phase=index*2.39996;this.mass=data.mass||1;this.dragged=false;this.vx=0;this.vy=0;
@@ -10,7 +10,7 @@ export class SkillCapsule {
 }
 export class SkillField {
   constructor(container,data,{reducedMotion=false}={}){
-    this.container=container;this.reducedMotion=reducedMotion;this.frame=null;this.inView=false;this.drag=null;
+    this.container=container;this.reducedMotion=reducedMotion;this.frame=null;this.inView=false;this.drag=null;this.motion=new SkillMotionState();
     this.items=data.map((d,i)=>new SkillCapsule(d,i,container));
     this.items.forEach(item=>{
       item.button.addEventListener('pointerdown',e=>this.start(e,item));
@@ -41,33 +41,41 @@ export class SkillField {
   }
   start(e,item){
     if(e.button!==0||this.drag)return;e.preventDefault();
-    item.button.focus({preventScroll:true});item.button.setPointerCapture(e.pointerId);item.button.classList.add('is-dragged');item.dragged=true;
-    this.drag={item,id:e.pointerId,startX:e.clientX,startY:e.clientY,x:item.x,y:item.y,lastX:e.clientX,lastY:e.clientY,time:e.timeStamp};this.animate();
+    this.motion.beginDrag();this.container.dataset.motion='dragging';
+    item.button.focus({preventScroll:true});item.button.setPointerCapture(e.pointerId);item.button.classList.add('is-dragged');item.dragged=true;item.vx=0;item.vy=0;
+    this.drag={item,id:e.pointerId,startX:e.clientX,startY:e.clientY,x:item.x,y:item.y,lastX:e.clientX,lastY:e.clientY,time:e.timeStamp,sampledAt:performance.now()};this.animate();
   }
   move(e){
     const d=this.drag;if(!d||d.id!==e.pointerId)return;e.preventDefault();
     const dt=Math.max(8,e.timeStamp-d.time)/1000;
     d.item.x=d.x+e.clientX-d.startX;d.item.y=d.y+e.clientY-d.startY;
-    d.item.vx=Math.max(-650,Math.min(650,(e.clientX-d.lastX)/dt));d.item.vy=Math.max(-650,Math.min(650,(e.clientY-d.lastY)/dt));
-    containCapsule(d.item,this.width,this.height);d.item.render();d.lastX=e.clientX;d.lastY=e.clientY;d.time=e.timeStamp;
+    const vx=Math.max(-900,Math.min(900,(e.clientX-d.lastX)/dt)),vy=Math.max(-900,Math.min(900,(e.clientY-d.lastY)/dt));
+    d.item.vx=d.item.vx*.3+vx*.7;d.item.vy=d.item.vy*.3+vy*.7;
+    containCapsule(d.item,this.width,this.height,null);d.item.render();d.lastX=e.clientX;d.lastY=e.clientY;d.time=e.timeStamp;d.sampledAt=performance.now();
   }
   end(e){
-    const d=this.drag;if(!d||d.id!==e.pointerId)return;this.drag=null;d.item.dragged=false;d.item.vx*=.35;d.item.vy*=.35;
+    const d=this.drag;if(!d||d.id!==e.pointerId)return;this.drag=null;d.item.dragged=false;
+    const cancelled=e.type==='pointercancel'||e.type==='lostpointercapture';
+    d.item.vx=cancelled?0:releaseVelocity(d.item.vx,e.timeStamp-d.time);d.item.vy=cancelled?0:releaseVelocity(d.item.vy,e.timeStamp-d.time);
+    this.motion.release(performance.now());this.container.dataset.motion='drifting';
     d.item.button.classList.remove('is-dragged');if(d.item.button.hasPointerCapture(e.pointerId))d.item.button.releasePointerCapture(e.pointerId);this.animate();
   }
   key(e,p){
     if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','Escape'].includes(e.key))return;e.preventDefault();
     if(e.key==='Home'||e.key==='Escape'){p.x=p.homeX;p.y=p.homeY;p.vx=0;p.vy=0;}
-    else{const dx=e.key==='ArrowLeft'?-28:e.key==='ArrowRight'?28:0,dy=e.key==='ArrowUp'?-28:e.key==='ArrowDown'?28:0;p.x+=dx;p.y+=dy;p.vx=dx*4;p.vy=dy*4;}
+    else{const dx=e.key==='ArrowLeft'?-28:e.key==='ArrowRight'?28:0,dy=e.key==='ArrowUp'?-28:e.key==='ArrowDown'?28:0;p.x+=dx;p.y+=dy;p.vx=dx*4;p.vy=dy*4;this.motion.release(performance.now());}
     containCapsule(p,this.width,this.height);p.render();this.animate();
   }
   animate(){
     if(this.frame||document.hidden)return;let last=performance.now();
     const tick=now=>{
       const dt=Math.min((now-last)/1000,.035);last=now;
-      stepCapsules(this.items,dt,{width:this.width,height:this.height,time:now/1000,reducedMotion:this.reducedMotion});this.items.forEach(p=>p.render());
+      if(this.drag&&now-this.drag.sampledAt>60){const decay=Math.exp(-dt*10);this.drag.item.vx*=decay;this.drag.item.vy*=decay;}
+      const returnToGrid=this.motion.shouldReturn(now);
+      this.container.dataset.motion=this.drag?'dragging':returnToGrid?'resetting':'drifting';
+      stepCapsules(this.items,dt,{width:this.width,height:this.height,time:now/1000,reducedMotion:this.reducedMotion,returnToGrid});this.items.forEach(p=>p.render());
       const settling=this.items.some(p=>Math.abs(p.x-p.homeX)+Math.abs(p.y-p.homeY)+Math.abs(p.vx)+Math.abs(p.vy)>.15);
-      if(this.inView&&!document.hidden&&(!this.reducedMotion||this.drag||settling))this.frame=requestAnimationFrame(tick);else this.frame=null;
+      if(this.inView&&!document.hidden&&(!this.reducedMotion||this.drag||!returnToGrid||settling))this.frame=requestAnimationFrame(tick);else this.frame=null;
     };this.frame=requestAnimationFrame(tick);
   }
 }
