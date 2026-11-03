@@ -1,4 +1,5 @@
-import {experiences,projects,skills} from './data.js?v=20261103-box-photos';
+import {experiences,projects,skills,artworks} from './data.js?v=20261103-art-stack';
+import {ArtStack} from './art-stack.js?v=20261103-art-stack';
 import {ProjectGallery} from './project-gallery.js?v=20261103-robot-gallery';
 import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
 import {SkillField} from './skills.js?v=20261103-skills-bounce';
@@ -256,6 +257,7 @@ projectDialog.addEventListener('cancel',e=>{e.preventDefault();closeProject();})
 projectDialog.addEventListener('click',e=>{if(e.target===projectDialog){const r=projectDialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeProject();}});
 new CardWheel(document.querySelector('#wheel'),experiences);
 new SkillField(document.querySelector('#skills-field'),skills,{reducedMotion});
+new ArtStack(document.querySelector('#art-stack'),artworks);
 new SpaceBackground(document.querySelector('#stars'));
 
 // Content remains navigable if a browser cannot create a WebGL context.

@@ -58,6 +58,12 @@ export const projects = [
     links:[{label:'Play Drawensic',url:'https://drawensic.com'}],media:[{type:'image',src:'./assets/drawensic-home.jpg',alt:'Drawensic homepage with its drawing game and community gallery'}]}
 ];
 
+export const artworks = [
+  {src:'./assets/art/hand-mirror.png',alt:'Line drawing of a hand holding a hanging mirror',paper:'#fff'},
+  {src:'./assets/art/gecko.webp',alt:'Green gecko lifting an oversized card in a room',paper:'#ede4c7'},
+  {src:'./assets/art/forest-creature.webp',alt:'Orange and cream creature in a dark red forest',paper:'#170b14'}
+];
+
 // Every skill is its own capsule object. Optional mass controls how easily it moves.
 export const skills = [
   {label:'Python'},{label:'Java'},{label:'C++'},{label:'JavaScript'},{label:'C'},{label:'Rust'},
