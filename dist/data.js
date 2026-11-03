@@ -25,9 +25,14 @@ export const experiences = [
   ],tech:['VEX IQ','VEXcode','Python','Mentoring']}
 ];
 export const projects = [
-  {id:'robot-arm',title:'AI Robotic Arm',kind:'Robotics · In development',theme:'robot',color:0xc78f4b,
-    description:'A four-axis robotic arm with a companion AI. I’m developing the software that lets it understand its surroundings and interact with people through machine learning and computer vision.',
-    points:['Computer vision with YOLO and OpenCV.','Persistent data and context for interactive companion behavior.','Built around Raspberry Pi and a Linux-based software stack.'],
+  {id:'robot-arm',title:'AI Robotic Arm',kind:'Robotics · Early development',theme:'robot',color:0xc78f4b,
+    description:'An early-stage project exploring a four-axis robotic arm with a companion AI. I’m currently studying and planning the base OS and foundational software design.',
+    points:['Long-term direction: computer vision and context-aware companion behavior on Raspberry Pi.'],
+    timeline:[
+      {phase:'Earlier',title:'Hardware exploration',description:'Initial hardware setup and dashboard experiments.'},
+      {phase:'Now · Early development',title:'Study & software planning',description:'Studying the base OS and planning the foundational software architecture.',current:true},
+      {phase:'Planned',title:'Core implementation',description:'Build on the study and design phase to implement the software foundation.'}
+    ],
     tech:['Raspberry Pi','OpenCV','OpenAI Realtime API','Linux','Python','C','Rust'],links:[],galleryLayout:'grid',media:[
       {type:'image',src:'./assets/robot-arm/setup.webp',alt:'Robotic arm beside the Raspberry Pi display and companion enclosure'},
       {type:'image',src:'./assets/robot-arm/console.webp',alt:'Companion console and assembled camera and speaker enclosure'},
