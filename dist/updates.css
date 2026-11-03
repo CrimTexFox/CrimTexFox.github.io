@@ -1,5 +1,5 @@
 /* Interaction and layout additions. Theme tokens remain in styles.css. */
-.wheel{height:520px}
+.wheel{height:520px;overflow:visible;clip-path:inset(-64px -30px 0);z-index:3}
 .wheel-stage{position:absolute;inset:0;will-change:transform;pointer-events:none}
 .journey-label{display:flex;gap:12px;align-items:baseline;font-size:12px;letter-spacing:1px}
 .journey-label>span{color:var(--orange);font-size:11px;letter-spacing:.5px}
@@ -14,4 +14,4 @@
 .project-button:hover .scene-fallback{transform:perspective(600px) rotateX(-12deg) rotateY(-25deg) scale(1.045)}
 .selected-card-stage{opacity:1}
 @media(max-width:850px){.site-header nav{gap:20px}.journey-label{gap:8px;font-size:10px}}
-@media(max-width:600px){.site-header nav{gap:12px;font-size:12px}.wordmark{font-size:14px}.wordmark>span{margin-left:5px}.wheel{height:500px}.journey-label{display:grid;gap:2px;text-align:right;font-size:9px;letter-spacing:.5px}.journey-label>span{font-size:9px}.section-heading{gap:12px}.skills{padding-top:62px}.skill-capsule{height:42px;padding:0 14px;font-size:14px}.skills-field{margin-top:14px}.projects{padding-top:65px}.project-grid{row-gap:35px}}
+@media(max-width:600px){.site-header nav{gap:12px;font-size:12px}.wordmark{font-size:14px}.wordmark>span{margin-left:5px}.wheel{height:500px;clip-path:inset(-64px -22px 0)}.journey-label{display:grid;gap:2px;text-align:right;font-size:9px;letter-spacing:.5px}.journey-label>span{font-size:9px}.section-heading{gap:12px}.skills{padding-top:62px}.skill-capsule{height:42px;padding:0 14px;font-size:14px}.skills-field{margin-top:14px}.projects{padding-top:65px}.project-grid{row-gap:35px}}

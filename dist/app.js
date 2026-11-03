@@ -2,6 +2,7 @@ import {experiences,projects,skills} from './data.js';
 import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
 import {SkillField} from './skills.js';
 import {SpaceBackground} from './space-background.js';
+import {wheelIdleMotion,cardFanMotion} from './wheel-motion.js';
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
 document.querySelector('#year').textContent=new Date().getFullYear();
@@ -50,7 +51,7 @@ export class CardWheel {
   constructor(container,data){
     this.container=container;this.holder=container.querySelector('.card-holder');this.stage=container.querySelector('.wheel-stage');
     this.rotation=0;this.target=0;this.velocity=0;this.drag=null;this.frame=null;this.lastDrag=-1000;this.lastInteraction=performance.now();
-    this.idleAngle=0;this.idleShift=0;this.hovered=false;this.inView=false;
+    this.idleAngle=0;this.idleShift=0;this.idleFan=0;this.idleClock=0;this.wasIdle=false;this.hovered=false;this.inView=false;
     this.cards=data.map((d,i)=>new WorkCard(d,i,card=>{if(performance.now()-this.lastDrag>220)openWork(card);}));
     this.cards.forEach(c=>this.holder.append(c.button));
     this.previous=document.querySelector('#previous');this.next=document.querySelector('#next');this.status=document.querySelector('#wheel-position');
@@ -121,13 +122,16 @@ export class CardWheel {
         const state=springStep(this.rotation,this.velocity,this.target,dt);this.rotation=state.position;this.velocity=state.velocity;
         if(Math.abs(this.rotation-this.target)<.025&&Math.abs(this.velocity)<.05){this.rotation=this.target;this.velocity=0;}
       }
-      const idle=!reducedMotion&&!this.drag&&!this.hovered&&!document.querySelector('dialog[open]')&&now-this.lastInteraction>4500;
+      const idle=!reducedMotion&&!this.drag&&!this.hovered&&!this.container.matches(':focus-within')&&!document.querySelector('dialog[open]')&&now-this.lastInteraction>4500;
       const width=this.container.clientWidth,mobile=matchMedia('(max-width: 600px)').matches;
       const allFit=cardsFitFrame(this.cards.length,this.rotation,{width,height:this.container.clientHeight,cardWidth:mobile?151:176,cardHeight:mobile?217:248,centerY:mobile?434:454});
-      const wave=Math.sin((now-this.lastInteraction-4500)/6500);
+      if(idle){if(!this.wasIdle)this.idleClock=0;this.idleClock+=dt*1000;}
+      this.wasIdle=idle;
+      const motion=wheelIdleMotion(this.idleClock,width,allFit);
       const ease=1-Math.exp(-dt*2);
-      this.idleAngle+=((idle?wave*(allFit?1.1:3.5):0)-this.idleAngle)*ease;
-      this.idleShift+=((idle&&!allFit?wave*Math.min(72,width*.13):0)-this.idleShift)*ease;
+      this.idleAngle+=((idle?motion.rotation:0)-this.idleAngle)*ease;
+      this.idleShift+=((idle?motion.shift:0)-this.idleShift)*ease;
+      this.idleFan+=((idle?1:0)-this.idleFan)*ease;
       this.render();
       if(this.inView&&!document.hidden&&!reducedMotion)this.frame=requestAnimationFrame(tick);else this.frame=null;
     };this.frame=requestAnimationFrame(tick);
@@ -142,8 +146,9 @@ export class CardWheel {
     const mobile=matchMedia('(max-width: 600px)').matches,centerY=mobile?434:454,cardWidth=mobile?151:176,cardHeight=mobile?217:248;
     this.stage.style.transform=`translateX(${this.idleShift}px)`;
     this.cards.forEach((c,i)=>{
-      const p=cardPosition(i,this.rotation+this.idleAngle);
-      c.button.style.transform=`translate(${p.x-cardWidth/2}px,${centerY+p.y-cardHeight/2}px) rotate(${p.angle}deg)`;
+      const base=cardPosition(i,this.rotation+this.idleAngle),fan=cardFanMotion(this.idleClock,base.angle,this.idleFan);
+      const p=cardPosition(i,this.rotation+this.idleAngle+fan.spread);
+      c.button.style.transform=`translate(${p.x-cardWidth/2}px,${centerY+p.y-cardHeight/2}px) rotate(${p.angle}deg) scale(${fan.scale})`;
       c.button.style.zIndex=String(Math.round(200-Math.abs(p.angle)));
       c.button.style.visibility=p.visible?'visible':'hidden';
       c.button.tabIndex=p.visible&&Math.abs(p.angle)<85?0:-1;
