@@ -12,6 +12,17 @@ test('a dragged capsule pushes a neighbor without being pushed away from the poi
   stepCapsules([a,b],1/30,{width:600,height:300,reducedMotion:true});
   assert.equal(a.x,245);assert.ok(b.x>300);assert.ok(!capsuleContact(a,b,4));
 });
+
+test('capsule rebound speed is forty percent of its original strength in both motion states',()=>{
+  for(const [returnToGrid,originalRebound] of [[false,.82],[true,.25]]){
+    const a=capsule(150,100),b=capsule(250,100);a.vx=100;b.vx=-100;a.vy=b.vy=35;
+    // Resolve contact without advancing time so drag and springs cannot alter impact speed.
+    stepCapsules([a,b],0,{width:600,height:300,returnToGrid});
+    assert.ok(a.vx<0&&b.vx>0,'the capsules must separate after impact');
+    assert.ok(Math.abs((b.vx-a.vx)-200*originalRebound*.4)<1e-9);
+    assert.equal(a.vy,35);assert.equal(b.vy,35);
+  }
+});
 test('released capsules settle back to their grid positions after a collision',()=>{
   const a=capsule(150,100),b=capsule(300,100);a.x=250;a.vx=200;
   for(let i=0;i<1200;i++)stepCapsules([a,b],1/120,{width:600,height:300,reducedMotion:true});

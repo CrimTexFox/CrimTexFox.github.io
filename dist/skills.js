@@ -1,4 +1,4 @@
-import {containCapsule,stepCapsules,SkillMotionState,releaseVelocity} from './capsule-physics.js?v=20261103-skills-drift';
+import {containCapsule,stepCapsules,SkillMotionState,releaseVelocity} from './capsule-physics.js?v=20261103-skills-bounce';
 export class SkillCapsule {
   constructor(data,index,container){
     this.data=data;this.phase=index*2.39996;this.mass=data.mass||1;this.dragged=false;this.vx=0;this.vy=0;

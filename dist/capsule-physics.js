@@ -1,5 +1,7 @@
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 export const SKILL_RESET_DELAY=3000;
+// Capsule-to-capsule rebound multiplier: 1 restores the original bounce.
+export const SKILL_COLLISION_BOUNCE=.4;
 export class SkillMotionState {
   constructor(){this.dragging=false;this.resetAt=null;}
   beginDrag(){this.dragging=true;this.resetAt=null;}
@@ -52,7 +54,8 @@ export function stepCapsules(items,dt,{width,height,time=0,reducedMotion=false,r
       const {nx,ny,depth}=contact,move=Math.max(0,depth-.05)*.85;
       a.x-=nx*move*ia/total;a.y-=ny*move*ia/total;b.x+=nx*move*ib/total;b.y+=ny*move*ib/total;
       const closing=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
-      if(closing<0){const impulse=-(returnToGrid?1.25:1.82)*closing/total;a.vx-=impulse*nx*ia;a.vy-=impulse*ny*ia;b.vx+=impulse*nx*ib;b.vy+=impulse*ny*ib;}
+      const restitution=(returnToGrid ? .25 : .82)*SKILL_COLLISION_BOUNCE;
+      if(closing<0){const impulse=-(1+restitution)*closing/total;a.vx-=impulse*nx*ia;a.vy-=impulse*ny*ia;b.vx+=impulse*nx*ib;b.vy+=impulse*ny*ib;}
       const bounce=returnToGrid ? .25 : .78;
       if(!a.dragged)containCapsule(a,width,height,bounce);if(!b.dragged)containCapsule(b,width,height,bounce);
     }
