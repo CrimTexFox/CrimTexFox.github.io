@@ -29,6 +29,8 @@ Dialogs open immediately, close with the close button, Escape, or an outside cli
 
 The GitHub Actions workflow publishes `dist/` to GitHub Pages on every push to `main`. In repository **Settings → Pages**, set **Source** to **GitHub Actions**. The expected public address is https://crimtexfox.github.io/.
 
+When updating a cached stylesheet or module, bump its `v` query in the corresponding HTML or JavaScript import so returning browsers load the new asset.
+
 The `.openai/hosting.json` file also records the private Sites preview identity. It contains no credentials.
 
 ## Assets and content
