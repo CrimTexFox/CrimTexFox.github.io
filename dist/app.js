@@ -1,7 +1,7 @@
 import {experiences,projects,skills} from './data.js?v=20261103-cards2';
 import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
 import {SkillField} from './skills.js';
-import {SpaceBackground} from './space-background.js';
+import {SpaceBackground} from './space-background.js?v=20261103-parallax';
 import {wheelIdleMotion,cardFanMotion} from './wheel-motion.js?v=20261103-cards2';
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
