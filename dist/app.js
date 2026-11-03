@@ -160,28 +160,44 @@ export class CardWheel {
 const workDialog=document.querySelector('#work-dialog'),projectDialog=document.querySelector('#project-dialog');
 let activeCard=null,activeBox=null,closingWork=false;
 function markModal(open){document.body.classList.toggle('modal-open',open);}
+function wheelCardTransform(card,stage){
+  const lift=card.button.querySelector('.card-lift'),source=lift.getBoundingClientRect(),target=stage.getBoundingClientRect();
+  const matrixFor=el=>{const value=getComputedStyle(el).transform;return new DOMMatrixReadOnly(value==='none'?undefined:value);};
+  const matrix=matrixFor(card.button).multiply(matrixFor(lift));
+  const x=source.x+source.width/2-target.x-target.width/2,y=source.y+source.height/2-target.y-target.height/2;
+  const rotation=Math.atan2(matrix.b,matrix.a)*180/Math.PI;
+  const scaleX=card.button.offsetWidth*Math.hypot(matrix.a,matrix.b)/target.width;
+  const scaleY=card.button.offsetHeight*Math.hypot(matrix.c,matrix.d)/target.height;
+  return `translate(${x}px,${y}px) rotate(${rotation}deg) scale(${scaleX},${scaleY})`;
+}
 function openWork(card){
   if(workDialog.open)return;activeCard=card;
+  workDialog.classList.remove('is-closing');
   const stage=workDialog.querySelector('.selected-card-stage');
   // A filled closing animation survives replaceChildren(). Clear it before reuse.
   stage.getAnimations().forEach(animation=>animation.cancel());stage.replaceChildren();
   const flip=element('div','selected-card'),front=card.createFront();front.classList.add('selected-front');flip.append(front,card.createBack());stage.append(flip);
   markModal(true);workDialog.showModal();
-  const start=card.button.getBoundingClientRect(),end=stage.getBoundingClientRect();
-  if(!reducedMotion)stage.animate([{transform:`translate(${start.x+start.width/2-end.x-end.width/2}px,${start.y+start.height/2-end.y-end.height/2}px) scale(${start.width/end.width},${start.height/end.height})`},{transform:'none'}],{duration:620,easing:'cubic-bezier(.18,.8,.2,1)'});
-  requestAnimationFrame(()=>requestAnimationFrame(()=>flip.classList.add('is-flipped')));
+  const origin=wheelCardTransform(card,stage);card.button.style.opacity='0';
+  if(!reducedMotion)stage.animate([{transform:origin},{transform:'none'}],{duration:620,easing:'cubic-bezier(.18,.8,.2,1)'});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(!closingWork&&stage.firstElementChild===flip)flip.classList.add('is-flipped');}));
 }
 async function closeWork(){
   if(!workDialog.open||closingWork)return;closingWork=true;
   const stage=workDialog.querySelector('.selected-card-stage');let closingAnimation;
   if(!reducedMotion){
+    const from=getComputedStyle(stage).transform;
+    stage.getAnimations().forEach(animation=>animation.cancel());
+    const destination=wheelCardTransform(activeCard,stage);
+    workDialog.classList.add('is-closing');
     const flip=stage.firstElementChild;
     flip.classList.remove('is-flipped');
-    stage.getAnimations().forEach(animation=>animation.cancel());
-    closingAnimation=stage.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.8) translateY(20px)'}],{duration:220,easing:'ease-in',fill:'forwards'});
+    closingAnimation=stage.animate([{transform:from},{transform:destination}],{duration:620,easing:'cubic-bezier(.8,0,.82,.2)',fill:'forwards'});
     await closingAnimation.finished;
   }
-  workDialog.close();closingAnimation?.cancel();markModal(false);activeCard?.button.focus({preventScroll:true});activeCard=null;closingWork=false;
+  workDialog.close();closingAnimation?.cancel();workDialog.classList.remove('is-closing');markModal(false);
+  if(activeCard){activeCard.button.style.opacity='';activeCard.button.focus({preventScroll:true});}
+  activeCard=null;closingWork=false;
 }
 workDialog.querySelector('.close-button').addEventListener('click',closeWork);
 workDialog.addEventListener('cancel',e=>{e.preventDefault();closeWork();});

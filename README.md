@@ -23,7 +23,7 @@ Edit `dist/data.js`. Add an object to `experiences` for a work card, `projects` 
 - Project `media` accepts `image` (`src`, `alt`), `video` (`src`, optional `poster`), `youtube` (`id`), `youtube-playlist` (`id`), and `illustration` entries. Put local media in `dist/assets/`.
 - Company card fronts use local SVG/PNG assets where available and text wordmarks otherwise. The PCB entry is a project, so its chip symbol is illustrative.
 
-Dialogs open immediately, close with the close button, Escape, or an outside click, and return focus to the triggering item. Keyboard arrows, Home, End, the navigation buttons, and horizontal touch/pointer drags operate the wheel. Vertical touch scrolling is preserved. Reduced-motion preferences are respected. A usable project fallback is shown if WebGL is unavailable.
+Dialogs open immediately, close with the close button, Escape, or an outside click, and return focus to the triggering item. Work cards reverse their opening flight when closed: they flip back, shrink, and return to their current position and angle on the wheel. The wheel copy stays hidden during the flight and is restored on arrival. Keyboard arrows, Home, End, the navigation buttons, and horizontal touch/pointer drags operate the wheel. Vertical touch scrolling is preserved. Reduced-motion preferences are respected. A usable project fallback is shown if WebGL is unavailable.
 
 ## Deploy
 
