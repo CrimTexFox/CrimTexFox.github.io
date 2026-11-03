@@ -38,5 +38,20 @@ export const projects = [
     description:'A 3D role-playing game prototype about escaping a city overrun by cats. I programmed and designed the game, collaborating with an artist on its world and visual direction.',
     points:['Programmed the game systems and 3D prototype in Godot.','Collaborated with an artist on game design and development.'],
     tech:['Godot','Python','Procreate','Audacity'],links:[{label:'Watch gameplay',url:'https://www.youtube.com/playlist?list=PLQBNQT2eutAddgxIImXf-Nu_gJPEx1dng'}],
-    media:[{type:'youtube-playlist',id:'PLQBNQT2eutAddgxIImXf-Nu_gJPEx1dng'}]}
+    media:[{type:'youtube-playlist',id:'PLQBNQT2eutAddgxIImXf-Nu_gJPEx1dng'}]},
+  {id:'drawensic',title:'Drawensic',kind:'Drawing game · Website',theme:'drawensic',color:0xbb8b50,
+    description:'A browser game where you draw a video game character from a written description, sign your artwork, and then discover who it was. A shared gallery lets you explore the community’s interpretations.',
+    points:['Canvas drawing tools with brushes, fill, eraser, and undo/redo.','Signed artwork, framed downloads, and a shared community gallery.'],
+    tech:['JavaScript','HTML Canvas','Node.js','Cloudflare Workers','D1','R2'],
+    links:[{label:'Play Drawensic',url:'https://drawensic.com'}],media:[{type:'image',src:'./assets/drawensic-home.jpg',alt:'Drawensic homepage with its drawing game and community gallery'}]}
+];
+
+// Every skill is its own capsule object. Optional mass controls how easily it moves.
+export const skills = [
+  {label:'Python'},{label:'Java'},{label:'C++'},{label:'JavaScript'},{label:'C'},{label:'Rust'},
+  {label:'Linux'},{label:'Godot'},{label:'MySQL'},{label:'Supabase'},{label:'OpenCV'},{label:'Raspberry Pi'},
+  {label:'Machine learning'},{label:'Computer vision'},{label:'OCR'},{label:'YOLO'},{label:'OpenAI API'},{label:'Realtime API'},
+  {label:'Teams API'},{label:'Zoom API'},{label:'Codex'},{label:'Claude'},{label:'Aseprite'},{label:'Audacity'},
+  {label:'Procreate'},{label:'VEXcode'},{label:'VEX IQ'},{label:'3D printing'},{label:'HCI'},{label:'UI design'},
+  {label:'Robotics'},{label:'Digital art'}
 ];

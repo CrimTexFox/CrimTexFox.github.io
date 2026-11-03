@@ -1,7 +1,7 @@
 import * as THREE from './assets/three.module.js';
 const orange=0xffb045;
 const mat=(color,roughness=.8,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
-function mesh(geometry,material,parent,x=0,y=0,z=0){const m=new THREE.Mesh(geometry,material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+function mesh(geometry,material,parent,x=0,y=0,z=0){const m=new THREE.Mesh(geometry,material);m.position.set(x,y,z);parent.add(m);return m;}
 function cube(parent,size,pos,color){return mesh(new THREE.BoxGeometry(...size),typeof color==='number'?mat(color):color,parent,...pos);}
 function cylinder(parent,radius,height,pos,color){return mesh(new THREE.CylinderGeometry(radius,radius,height,24),mat(color),parent,...pos);}
 function sphere(parent,radius,pos,color){return mesh(new THREE.SphereGeometry(radius,20,14),mat(color),parent,...pos);}
@@ -13,12 +13,14 @@ function labelTexture(project){
   for(let i=0;i<4500;i++){ctx.fillStyle=i%2?'#ffffff07':'#00000007';ctx.fillRect((i*149)%512,(i*83)%320,1.5,1.5);}
   ctx.strokeStyle='#e9d5ac70';ctx.lineWidth=2;
   ctx.fillStyle=project.theme==='horror'?'#ffb045':'#30251a';ctx.textAlign='center';ctx.font='31px "STIX Two Math",serif';ctx.fillText(project.title,256,184);
-  ctx.font='13px "STIX Two Math",serif';ctx.fillText(project.theme==='robot'?'HARDWARE / 01':project.theme==='horror'?'HANDLE WITH FEAR':'A WORLD IN PROGRESS',256,221);
+  ctx.font='13px "STIX Two Math",serif';ctx.fillText(project.theme==='robot'?'HARDWARE / 01':project.theme==='horror'?'HANDLE WITH FEAR':project.theme==='drawensic'?'DRAW / SIGN / DISCOVER':'A WORLD IN PROGRESS',256,221);
   ctx.save();ctx.translate(256,94);
   if(project.theme==='robot'){
     ctx.lineWidth=3;ctx.strokeRect(-22,-22,44,44);for(let i=-14;i<=14;i+=14){for(let sign of [-1,1]){ctx.beginPath();ctx.moveTo(sign*22,i);ctx.lineTo(sign*31,i);ctx.stroke();ctx.beginPath();ctx.moveTo(i,sign*22);ctx.lineTo(i,sign*31);ctx.stroke();}}
   }else if(project.theme==='cat'){
     ctx.beginPath();ctx.moveTo(-28,19);ctx.lineTo(-28,-23);ctx.lineTo(-8,-8);ctx.quadraticCurveTo(0,-14,8,-8);ctx.lineTo(28,-23);ctx.lineTo(28,19);ctx.quadraticCurveTo(0,42,-28,19);ctx.fill();
+  }else if(project.theme==='drawensic'){
+    ctx.lineWidth=3;ctx.strokeStyle='#30251a';ctx.strokeRect(-36,-22,72,49);ctx.beginPath();ctx.moveTo(-36,-10);ctx.lineTo(36,-10);ctx.stroke();ctx.beginPath();ctx.moveTo(-16,15);ctx.lineTo(14,-4);ctx.lineTo(20,2);ctx.lineTo(-10,21);ctx.closePath();ctx.fill();
   }else{
     ctx.strokeStyle='#ffb045';ctx.lineWidth=4;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*15+10,-29);ctx.lineTo(i*15-10,27);ctx.stroke();}
   }
@@ -79,6 +81,35 @@ function key(parent,x,z,rotation){
   const ring=mesh(new THREE.TorusGeometry(.12,.035,8,24),mat(0xd7ac64,.4,.5),g);ring.rotation.x=Math.PI/2;
   cube(g,[.065,.05,.35],[0,0,.25],0xd7ac64);cube(g,[.14,.05,.055],[.04,0,.38],0xd7ac64);
 }
+function drawingTablet(parent){
+  const group=new THREE.Group();group.position.set(-1.05,.17,.96);group.rotation.y=-.2;parent.add(group);
+  cube(group,[1.02,.09,.75],[0,0,0],0x303033);
+  const canvas=document.createElement('canvas');canvas.width=360;canvas.height=240;const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#f1e9d7';ctx.fillRect(0,0,360,240);ctx.fillStyle='#29282a';ctx.fillRect(0,0,360,30);
+  for(let i=0;i<3;i++){ctx.fillStyle=i===0?'#ffb045':'#aaa396';ctx.beginPath();ctx.arc(15+i*14,15,4,0,Math.PI*2);ctx.fill();}
+  ctx.strokeStyle='#ad7834';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.arc(180,139,59,0,Math.PI*2);ctx.moveTo(149,123);ctx.lineTo(152,123);ctx.moveTo(208,123);ctx.lineTo(211,123);ctx.moveTo(152,153);ctx.quadraticCurveTo(180,182,210,153);ctx.stroke();
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+  const screen=mesh(new THREE.PlaneGeometry(.91,.63),new THREE.MeshBasicMaterial({map:texture}),group,0,.051,0);screen.rotation.x=-Math.PI/2;
+  const pencil=new THREE.Group();pencil.position.set(.68,.04,.05);pencil.rotation.z=-.25;pencil.rotation.x=Math.PI/2;group.add(pencil);
+  cylinder(pencil,.035,.73,[0,0,0],orange);mesh(new THREE.ConeGeometry(.035,.14,12),mat(0xe1ca9e),pencil,0,.435,0);
+  return group;
+}
+function contactShadow(){
+  const c=document.createElement('canvas');c.width=128;c.height=128;const ctx=c.getContext('2d');
+  const gradient=ctx.createRadialGradient(64,64,6,64,64,64);gradient.addColorStop(0,'rgba(0,0,0,.6)');gradient.addColorStop(.45,'rgba(0,0,0,.28)');gradient.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=gradient;ctx.fillRect(0,0,128,128);
+  return new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false});
+}
+// Panels meet at their edges. Overlapping outer faces cause z-fighting on hover.
+export function buildBoxShell(parent,{cardboard,inside,front}){
+  const panels=[
+    cube(parent,[1.85,.1,1.4],[0,.05,0],inside),
+    cube(parent,[2,1.05,.07],[0,.55,-.74],cardboard),
+    cube(parent,[.07,1.05,1.41],[-.965,.55,0],cardboard),
+    cube(parent,[.07,1.05,1.41],[.965,.55,0],cardboard),
+    cube(parent,[2,1.05,.07],[0,.55,.74],[cardboard,cardboard,cardboard,cardboard,front,cardboard])
+  ];
+  return panels;
+}
 
 // A reusable real 3D model. New project entries automatically get a matching box.
 export class ProjectBox {
@@ -96,25 +127,23 @@ export class ProjectBox {
   }
   build(){
     this.renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFShadowMap;
+    // Soft contact shadow only: moving thin cardboard must not self-shadow.
+    this.renderer.shadowMap.enabled=false;
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.4;this.host.append(this.renderer.domElement);
     this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(32,1,.1,40);this.camera.position.set(4.1,3.15,5.8);this.camera.lookAt(0,.72,0);
     this.scene.add(new THREE.HemisphereLight(0xfff1d8,0x3e4049,3));
-    const light=new THREE.DirectionalLight(0xffe0ac,4.5);light.position.set(-3,7,5);light.castShadow=true;light.shadow.mapSize.set(1024,1024);light.shadow.camera.left=-4;light.shadow.camera.right=4;light.shadow.camera.top=4;light.shadow.camera.bottom=-4;light.shadow.normalBias=.03;this.scene.add(light);
+    const light=new THREE.DirectionalLight(0xffe0ac,4.5);light.position.set(-3,7,5);this.scene.add(light);
     const rim=new THREE.DirectionalLight(0xc6d7ed,2);rim.position.set(4,3,-4);this.scene.add(rim);
-    const ground=mesh(new THREE.PlaneGeometry(12,12),new THREE.ShadowMaterial({opacity:.3}),this.scene,0,-.02,0);ground.rotation.x=-Math.PI/2;ground.castShadow=false;
+    const ground=mesh(new THREE.PlaneGeometry(5,4),contactShadow(),this.scene,0,-.02,0);ground.rotation.x=-Math.PI/2;ground.renderOrder=-1;
     this.group=new THREE.Group();this.group.rotation.y=-.19;this.scene.add(this.group);
     const cardboard=mat(this.project.color),inside=mat(this.project.theme==='horror'?0x24201b:0x91653b);
     const box=new THREE.Group();this.group.add(box);box.position.set(0,.1,0);
-    cube(box,[2,.1,1.55],[0,.05,0],inside);
-    cube(box,[2,1.05,.07],[0,.55,-.74],cardboard);
-    cube(box,[.07,1.05,1.55],[-.965,.55,0],cardboard);cube(box,[.07,1.05,1.55],[.965,.55,0],cardboard);
     const labelMat=new THREE.MeshStandardMaterial({map:labelTexture(this.project),roughness:.92});
-    cube(box,[2,1.05,.07],[0,.55,.74],[cardboard,cardboard,cardboard,cardboard,labelMat,cardboard]);
+    buildBoxShell(box,{cardboard,inside,front:labelMat});
     // Lid geometry is hinged to the rear edge, not translated out of the box.
-    this.hinge=new THREE.Group();this.hinge.position.set(0,1.1,-.79);box.add(this.hinge);
+    this.hinge=new THREE.Group();this.hinge.position.set(0,1.12,-.79);box.add(this.hinge);
     cube(this.hinge,[2.08,.095,1.64],[0,.02,.8],cardboard);
-    cube(this.hinge,[.32,.008,1.65],[0,.072,.8],mat(this.project.theme==='horror'?0x332c23:0xd8b77b));
+    cube(this.hinge,[.32,.008,1.65],[0,.08,.8],mat(this.project.theme==='horror'?0x332c23:0xd8b77b));
     for(const x of [-.75,.75])cube(box,[.04,.75,.005],[x,.55,.781],mat(0x302619));
     if(this.project.theme==='robot'){
       pi(this.group);breadboard(this.group);roboticArm(this.group);
@@ -122,6 +151,8 @@ export class ProjectBox {
       wire(this.group,[[-1.1,.23,.93],[-1.0,.36,1.31],[.1,.22,1.5],[1,.17,1.1]],0xc9c4b7,.017);
     }else if(this.project.theme==='horror'){
       controller(this.group,-.85,1.1);key(this.group,.9,1.05,-.5);key(this.group,1.25,.5,.5);
+    }else if(this.project.theme==='drawensic'){
+      drawingTablet(this.group);const pad=controller(this.group,1.12,.95,0xc8c4b8);pad.scale.setScalar(.65);
     }else{controller(this.group,-.85,1.05,0xc8c4b8);cat(this.group);}
     this.resize();
   }
@@ -130,7 +161,7 @@ export class ProjectBox {
     this.renderer.setSize(w,h,false);this.camera.aspect=w/h;
     this.camera.position.set(4.1,3.15,5.8);if(w/h<.9)this.camera.position.multiplyScalar(1.12);this.camera.lookAt(0,.72,0);this.camera.updateProjectionMatrix();this.render();
   }
-  render(){if(this.renderer&&this.hinge){this.hinge.rotation.x=-this.open*1.85;this.group.rotation.y=-.19+this.hover*.11;this.group.position.y=this.hover*.04;this.renderer.render(this.scene,this.camera);}}
+  render(){if(this.renderer&&this.hinge){this.hinge.rotation.x=-this.open*1.85;this.group.rotation.y=-.19+this.hover*.065;this.group.position.y=this.hover*.065;this.group.scale.setScalar(1+this.hover*.045);this.renderer.render(this.scene,this.camera);}}
   setOpen(open){this.targetOpen=open?1:0;this.animate();}
   animate(){
     if(!this.renderer||this.frame)return;

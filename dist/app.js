@@ -1,5 +1,7 @@
-import {experiences,projects} from './data.js';
-import {CARD_SPACING,WHEEL_RADIUS,clamp,limitRotation,resistedRotation,cardPosition,springStep} from './wheel-math.js';
+import {experiences,projects,skills} from './data.js';
+import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
+import {SkillField} from './skills.js';
+import {SpaceBackground} from './space-background.js';
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
 document.querySelector('#year').textContent=new Date().getFullYear();
@@ -46,8 +48,9 @@ export class WorkCard {
 
 export class CardWheel {
   constructor(container,data){
-    this.container=container;this.holder=container.querySelector('.card-holder');
-    this.rotation=0;this.target=0;this.velocity=0;this.drag=null;this.frame=null;this.lastDrag=0;
+    this.container=container;this.holder=container.querySelector('.card-holder');this.stage=container.querySelector('.wheel-stage');
+    this.rotation=0;this.target=0;this.velocity=0;this.drag=null;this.frame=null;this.lastDrag=-1000;this.lastInteraction=performance.now();
+    this.idleAngle=0;this.idleShift=0;this.hovered=false;this.inView=false;
     this.cards=data.map((d,i)=>new WorkCard(d,i,card=>{if(performance.now()-this.lastDrag>220)openWork(card);}));
     this.cards.forEach(c=>this.holder.append(c.button));
     this.previous=document.querySelector('#previous');this.next=document.querySelector('#next');this.status=document.querySelector('#wheel-position');
@@ -59,14 +62,20 @@ export class CardWheel {
     container.addEventListener('keydown',e=>{
       if(['ArrowRight','ArrowLeft','Home','End'].includes(e.key)){
         e.preventDefault();
-        if(e.key==='Home')this.setTarget(0);else if(e.key==='End')this.setTarget(-(this.cards.length-1)*CARD_SPACING);else this.go(e.key==='ArrowRight'?1:-1);
+        if(e.key==='Home')this.setTarget(0);else if(e.key==='End')this.setTarget(-cardSlot(this.cards.length-1)*CARD_SPACING);else this.go(e.key==='ArrowRight'?1:-1);
       }
     });
-    new ResizeObserver(()=>this.render()).observe(container);this.render();this.updateStatus();
+    container.addEventListener('pointerenter',()=>{this.hovered=true;this.lastInteraction=performance.now();});
+    container.addEventListener('pointerleave',()=>{this.hovered=false;this.lastInteraction=performance.now();});
+    container.addEventListener('focusin',()=>{this.lastInteraction=performance.now();});
+    new ResizeObserver(()=>this.render()).observe(container);
+    new IntersectionObserver(entries=>{this.inView=entries[0].isIntersecting;if(this.inView)this.animate();},{rootMargin:'100px'}).observe(container);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.animate();});
+    this.render();this.updateStatus();
   }
   start(e){
     if(e.button!==0||this.cards.length<2)return;
-    if(this.frame)cancelAnimationFrame(this.frame);this.frame=null;
+    this.lastInteraction=performance.now();
     this.drag={id:e.pointerId,x:e.clientX,y:e.clientY,rotation:this.rotation,lastX:e.clientX,time:e.timeStamp,moved:false};
     this.velocity=0;
   }
@@ -90,8 +99,7 @@ export class CardWheel {
     this.drag=null;this.container.classList.remove('dragging');
     if(d.moved){this.lastDrag=performance.now();if(this.container.hasPointerCapture(e.pointerId))this.container.releasePointerCapture(e.pointerId);}
     if(cancelled)this.velocity=0;
-    const projected=this.rotation+(d.moved?this.velocity*.12:0);
-    this.setTarget(Math.round(projected/CARD_SPACING)*CARD_SPACING);
+    if(d.moved||cancelled){const projected=this.rotation+(d.moved?this.velocity*.12:0);this.setTarget(Math.round(projected/CARD_SPACING)*CARD_SPACING);}
   }
   go(direction){
     const next=limitRotation(this.target-direction*CARD_SPACING,this.cards.length);
@@ -100,26 +108,41 @@ export class CardWheel {
     this.setTarget(next);
   }
   setTarget(value){
-    this.target=limitRotation(value,this.cards.length);this.updateStatus();
+    this.lastInteraction=performance.now();this.target=limitRotation(value,this.cards.length);this.updateStatus();
     if(reducedMotion){this.rotation=this.target;this.velocity=0;this.render();return;}
-    if(this.frame)cancelAnimationFrame(this.frame);
+    this.animate();
+  }
+  animate(){
+    if(this.frame||document.hidden)return;
     let last=performance.now();
     const tick=now=>{
       const dt=Math.min((now-last)/1000,.025);last=now;
-      const state=springStep(this.rotation,this.velocity,this.target,dt);this.rotation=state.position;this.velocity=state.velocity;this.render();
-      if(Math.abs(this.rotation-this.target)<.025&&Math.abs(this.velocity)<.05){this.rotation=this.target;this.velocity=0;this.render();this.frame=null;}
-      else this.frame=requestAnimationFrame(tick);
+      if(!this.drag){
+        const state=springStep(this.rotation,this.velocity,this.target,dt);this.rotation=state.position;this.velocity=state.velocity;
+        if(Math.abs(this.rotation-this.target)<.025&&Math.abs(this.velocity)<.05){this.rotation=this.target;this.velocity=0;}
+      }
+      const idle=!reducedMotion&&!this.drag&&!this.hovered&&!document.querySelector('dialog[open]')&&now-this.lastInteraction>4500;
+      const width=this.container.clientWidth,mobile=matchMedia('(max-width: 600px)').matches;
+      const allFit=cardsFitFrame(this.cards.length,this.rotation,{width,height:this.container.clientHeight,cardWidth:mobile?151:176,cardHeight:mobile?217:248,centerY:mobile?434:454});
+      const wave=Math.sin((now-this.lastInteraction-4500)/6500);
+      const ease=1-Math.exp(-dt*2);
+      this.idleAngle+=((idle?wave*(allFit?1.1:3.5):0)-this.idleAngle)*ease;
+      this.idleShift+=((idle&&!allFit?wave*Math.min(72,width*.13):0)-this.idleShift)*ease;
+      this.render();
+      if(this.inView&&!document.hidden&&!reducedMotion)this.frame=requestAnimationFrame(tick);else this.frame=null;
     };this.frame=requestAnimationFrame(tick);
   }
   updateStatus(){
-    const selected=Math.round(-this.target/CARD_SPACING);
+    const selected=this.cards.findIndex((_,i)=>cardSlot(i)===Math.round(-this.target/CARD_SPACING));
     this.status.textContent=`${String(selected+1).padStart(2,'0')} / ${String(this.cards.length).padStart(2,'0')}`;
-    this.previous.setAttribute('aria-disabled',String(selected===0));this.next.setAttribute('aria-disabled',String(selected===this.cards.length-1));
+    const bounds=rotationBounds(this.cards.length);
+    this.previous.setAttribute('aria-disabled',String(this.target===bounds.max));this.next.setAttribute('aria-disabled',String(this.target===bounds.min));
   }
   render(){
     const mobile=matchMedia('(max-width: 600px)').matches,centerY=mobile?434:454,cardWidth=mobile?151:176,cardHeight=mobile?217:248;
+    this.stage.style.transform=`translateX(${this.idleShift}px)`;
     this.cards.forEach((c,i)=>{
-      const p=cardPosition(i,this.rotation);
+      const p=cardPosition(i,this.rotation+this.idleAngle);
       c.button.style.transform=`translate(${p.x-cardWidth/2}px,${centerY+p.y-cardHeight/2}px) rotate(${p.angle}deg)`;
       c.button.style.zIndex=String(Math.round(200-Math.abs(p.angle)));
       c.button.style.visibility=p.visible?'visible':'hidden';
@@ -134,7 +157,9 @@ let activeCard=null,activeBox=null,closingWork=false;
 function markModal(open){document.body.classList.toggle('modal-open',open);}
 function openWork(card){
   if(workDialog.open)return;activeCard=card;
-  const stage=workDialog.querySelector('.selected-card-stage');stage.replaceChildren();
+  const stage=workDialog.querySelector('.selected-card-stage');
+  // A filled closing animation survives replaceChildren(). Clear it before reuse.
+  stage.getAnimations().forEach(animation=>animation.cancel());stage.replaceChildren();
   const flip=element('div','selected-card'),front=card.createFront();front.classList.add('selected-front');flip.append(front,card.createBack());stage.append(flip);
   markModal(true);workDialog.showModal();
   const start=card.button.getBoundingClientRect(),end=stage.getBoundingClientRect();
@@ -143,12 +168,15 @@ function openWork(card){
 }
 async function closeWork(){
   if(!workDialog.open||closingWork)return;closingWork=true;
+  const stage=workDialog.querySelector('.selected-card-stage');let closingAnimation;
   if(!reducedMotion){
-    const stage=workDialog.querySelector('.selected-card-stage');const flip=stage.firstElementChild;
+    const flip=stage.firstElementChild;
     flip.classList.remove('is-flipped');
-    await stage.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.8) translateY(20px)'}],{duration:220,easing:'ease-in',fill:'forwards'}).finished;
+    stage.getAnimations().forEach(animation=>animation.cancel());
+    closingAnimation=stage.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.8) translateY(20px)'}],{duration:220,easing:'ease-in',fill:'forwards'});
+    await closingAnimation.finished;
   }
-  workDialog.close();markModal(false);activeCard?.button.focus({preventScroll:true});activeCard=null;closingWork=false;
+  workDialog.close();closingAnimation?.cancel();markModal(false);activeCard?.button.focus({preventScroll:true});activeCard=null;closingWork=false;
 }
 workDialog.querySelector('.close-button').addEventListener('click',closeWork);
 workDialog.addEventListener('cancel',e=>{e.preventDefault();closeWork();});
@@ -186,16 +214,8 @@ projectDialog.querySelector('.close-button').addEventListener('click',closeProje
 projectDialog.addEventListener('cancel',e=>{e.preventDefault();closeProject();});
 projectDialog.addEventListener('click',e=>{if(e.target===projectDialog){const r=projectDialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeProject();}});
 new CardWheel(document.querySelector('#wheel'),experiences);
-
-// A quiet, deterministic starfield; no images or looping background animations.
-const canvas=document.querySelector('#stars'),ctx=canvas.getContext('2d');
-function drawStars(){
-  const dpr=Math.min(devicePixelRatio,2),w=innerWidth,h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-  let seed=23;const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
-  for(let i=0;i<Math.round(w*h/6500);i++){const x=random()*w,y=random()*h,r=random()*.8+.3;ctx.fillStyle=`rgba(245,239,224,${.13+random()*.48})`;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
-  [[.12,.32],[.86,.21],[.76,.78],[.23,.89]].forEach(([x,y],i)=>{ctx.strokeStyle=i%2?'#ffb04580':'#ffffff60';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(w*x-3,h*y);ctx.lineTo(w*x+3,h*y);ctx.moveTo(w*x,h*y-3);ctx.lineTo(w*x,h*y+3);ctx.stroke();});
-}
-addEventListener('resize',drawStars);drawStars();
+new SkillField(document.querySelector('#skills-field'),skills,{reducedMotion});
+new SpaceBackground(document.querySelector('#stars'));
 
 // Content remains navigable if a browser cannot create a WebGL context.
 await document.fonts.ready;

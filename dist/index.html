@@ -8,6 +8,7 @@
   <title>Shawn Fishkov</title>
   <link rel="preload" href="./assets/stix-two-math.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./updates.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
@@ -15,7 +16,7 @@
   <canvas id="stars" aria-hidden="true"></canvas>
   <header class="site-header">
     <a href="#" class="wordmark" aria-label="Back to top">Shawn Fishkov<span>✦</span></a>
-    <nav aria-label="Main navigation"><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="mailto:shawnfishkov.ac2@gmail.com">Say hello <span>↗</span></a></nav>
+    <nav aria-label="Main navigation"><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="mailto:shawnfishkov.ac2@gmail.com">Say hello <span>↗</span></a></nav>
   </header>
   <main id="main">
     <section class="intro" aria-labelledby="intro-title">
@@ -27,16 +28,18 @@
       <a class="down-link" href="#experience" aria-label="Explore experience">↓</a>
     </section>
     <section id="experience" class="experience section" aria-labelledby="experience-title">
-      <div class="section-heading"><span class="section-no">01 /</span><h2 id="experience-title">Experience</h2><span class="section-aside">A hand of things I've done.</span></div>
+      <div class="section-heading"><span class="section-no">01 /</span><h2 id="experience-title">Experience</h2><span class="section-aside journey-label">The Journey <span>2023–2026</span></span></div>
       <div id="wheel" class="wheel" role="region" aria-label="Work experience card wheel. Drag sideways or use the arrow buttons." tabindex="0">
-        <div class="orbit" aria-hidden="true"><span class="orbit-center">✦</span></div>
-        <div class="wheel-label" aria-hidden="true"><span>THE JOURNEY</span><span>2023 — 2026</span></div>
-        <div id="card-holder" class="card-holder"></div>
+        <div class="wheel-stage"><div class="orbit" aria-hidden="true"><span class="orbit-center">✦</span></div><div id="card-holder" class="card-holder"></div></div>
       </div>
       <div class="wheel-controls"><button id="previous" class="arrow-button" aria-label="Previous experience">&lt;</button><span id="wheel-position" class="wheel-position" aria-live="polite">01 / 05</span><button id="next" class="arrow-button" aria-label="Next experience">&gt;</button></div>
     </section>
+    <section id="skills" class="skills section" aria-labelledby="skills-title">
+      <div class="section-heading"><span class="section-no">02 /</span><h2 id="skills-title">Skills</h2></div>
+      <div id="skills-field" class="skills-field" role="group" aria-label="Skills. Drag a capsule to move it, or focus it and use the arrow keys."></div>
+    </section>
     <section id="projects" class="projects section" aria-labelledby="projects-title">
-      <div class="section-heading"><span class="section-no">02 /</span><h2 id="projects-title">Projects</h2><span class="section-aside">Open something up.</span></div>
+      <div class="section-heading"><span class="section-no">03 /</span><h2 id="projects-title">Projects</h2></div>
       <div id="project-grid" class="project-grid"></div>
     </section>
     <footer><p>Always making something.</p><a href="mailto:shawnfishkov.ac2@gmail.com">Let's talk <span>↗</span></a><div class="footer-bottom"><span>© <span id="year"></span> Shawn Fishkov</span><span>Irvine, California <span class="orange">✦</span></span><a href="#">Back to top ↑</a></div></footer>
