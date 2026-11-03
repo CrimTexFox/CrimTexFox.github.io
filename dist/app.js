@@ -1,4 +1,5 @@
-import {experiences,projects,skills} from './data.js?v=20261103-cat-player';
+import {experiences,projects,skills} from './data.js?v=20261103-robot-gallery';
+import {ProjectGallery} from './project-gallery.js?v=20261103-robot-gallery';
 import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
 import {SkillField} from './skills.js?v=20261103-skills-bounce';
 import {SpaceBackground} from './space-background.js?v=20261103-parallax';
@@ -217,8 +218,8 @@ function openProject(project,box){
   if(project.points?.length){const ul=element('ul','project-notes');project.points.forEach(p=>ul.append(element('li','',p)));content.append(ul);}
   content.append(element('p','project-technologies',project.tech.join(' / ')));
   if(project.links?.length){const links=element('div','project-links');project.links.forEach(link=>{const a=element('a','',`${link.label} ↗`);a.href=link.url;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});content.append(links);}
-  const gallery=element('div','project-gallery');
-  for(const media of project.media||[]){
+  const gallery=project.galleryLayout==='grid'?new ProjectGallery(project).element:element('div','project-gallery');
+  for(const media of project.galleryLayout==='grid'?[]:project.media||[]){
     if(media.type==='image'){
       const img=element('img');img.src=media.src;img.alt=media.alt;img.loading='lazy';gallery.append(img);
     }else if(media.type==='video'){
@@ -237,7 +238,7 @@ function openProject(project,box){
   content.append(gallery);markModal(true);projectDialog.showModal();projectDialog.scrollTop=0;
 }
 function closeProject(){
-  if(!projectDialog.open)return;projectDialog.close();markModal(false);
+  if(!projectDialog.open)return;ProjectGallery.closeViewer();projectDialog.close();markModal(false);
   projectDialog.querySelectorAll('iframe').forEach(f=>f.remove());projectDialog.querySelectorAll('video').forEach(v=>v.pause());
   activeBox?.setOpen(false);activeBox?.button.focus({preventScroll:true});activeBox=null;
 }

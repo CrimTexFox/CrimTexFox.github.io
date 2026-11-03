@@ -28,7 +28,14 @@ export const projects = [
   {id:'robot-arm',title:'AI Robotic Arm',kind:'Robotics · In development',theme:'robot',color:0xc78f4b,
     description:'A four-axis robotic arm with a companion AI. I’m developing the software that lets it understand its surroundings and interact with people through machine learning and computer vision.',
     points:['Computer vision with YOLO and OpenCV.','Persistent data and context for interactive companion behavior.','Built around Raspberry Pi and a Linux-based software stack.'],
-    tech:['Raspberry Pi','OpenCV','OpenAI Realtime API','Linux','Python','C','Rust'],links:[],media:[{type:'illustration',caption:'Illustration of the project’s hardware setup.'}]},
+    tech:['Raspberry Pi','OpenCV','OpenAI Realtime API','Linux','Python','C','Rust'],links:[],galleryLayout:'grid',media:[
+      {type:'image',src:'./assets/robot-arm/setup.webp',alt:'Robotic arm beside the Raspberry Pi display and companion enclosure'},
+      {type:'image',src:'./assets/robot-arm/console.webp',alt:'Companion console and assembled camera and speaker enclosure'},
+      {type:'image',src:'./assets/robot-arm/arm.webp',alt:'Full robotic arm and companion hardware on the workbench'},
+      {type:'image',src:'./assets/robot-arm/wiring.webp',alt:'Raspberry Pi, camera ribbons, and companion wiring during assembly'},
+      {type:'image',src:'./assets/robot-arm/displays.webp',alt:'Companion face display and camera dashboard during development'},
+      {type:'video',src:'./assets/robot-arm/demo.mp4',poster:'./assets/robot-arm/demo-poster.jpg',alt:'Robot arm demonstration'}
+    ]},
   {id:'dont-hide',title:'Don’t Hide',kind:'Horror game · Published',theme:'horror',color:0x695743,
     description:'An independent horror game I conceived, designed, developed, and published on Steam. Trapped in a maze with a creature, you have to find five keys and escape before it catches your scent.',
     points:['Designed and built the game from concept through release.','More than 1,000 licenses granted.'],
