@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070708">
+  <meta name="description" content="Shawn Fishkov — software engineering, robotics, and games. Explore my work and projects.">
+  <title>Shawn Fishkov</title>
+  <link rel="preload" href="./assets/stix-two-math.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <a href="#" class="wordmark" aria-label="Back to top">Shawn Fishkov<span>✦</span></a>
+    <nav aria-label="Main navigation"><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="mailto:shawnfishkov.ac2@gmail.com">Say hello <span>↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="intro" aria-labelledby="intro-title">
+      <p class="eyebrow">SOFTWARE · ROBOTICS · PLAY</p>
+      <h1 id="intro-title">Shawn Fishkov<span class="orange">.</span></h1>
+      <p class="intro-line">I build things that think, move, and play.</p>
+      <p class="intro-detail">Software Engineering at UC Irvine <span>·</span> Irvine, CA</p>
+      <div class="social-links"><a href="https://github.com/CrimTexFox" target="_blank" rel="noopener noreferrer">GitHub <span>↗</span></a><a href="https://www.linkedin.com/in/shawn-fishkov-64a4a5238/" target="_blank" rel="noopener noreferrer">LinkedIn <span>↗</span></a><a href="mailto:shawnfishkov.ac2@gmail.com">Email <span>↗</span></a></div>
+      <a class="down-link" href="#experience" aria-label="Explore experience">↓</a>
+    </section>
+    <section id="experience" class="experience section" aria-labelledby="experience-title">
+      <div class="section-heading"><span class="section-no">01 /</span><h2 id="experience-title">Experience</h2><span class="section-aside">A hand of things I've done.</span></div>
+      <div id="wheel" class="wheel" role="region" aria-label="Work experience card wheel. Drag sideways or use the arrow buttons." tabindex="0">
+        <div class="orbit" aria-hidden="true"><span class="orbit-center">✦</span></div>
+        <div class="wheel-label" aria-hidden="true"><span>THE JOURNEY</span><span>2023 — 2026</span></div>
+        <div id="card-holder" class="card-holder"></div>
+      </div>
+      <div class="wheel-controls"><button id="previous" class="arrow-button" aria-label="Previous experience">&lt;</button><span id="wheel-position" class="wheel-position" aria-live="polite">01 / 05</span><button id="next" class="arrow-button" aria-label="Next experience">&gt;</button></div>
+    </section>
+    <section id="projects" class="projects section" aria-labelledby="projects-title">
+      <div class="section-heading"><span class="section-no">02 /</span><h2 id="projects-title">Projects</h2><span class="section-aside">Open something up.</span></div>
+      <div id="project-grid" class="project-grid"></div>
+    </section>
+    <footer><p>Always making something.</p><a href="mailto:shawnfishkov.ac2@gmail.com">Let's talk <span>↗</span></a><div class="footer-bottom"><span>© <span id="year"></span> Shawn Fishkov</span><span>Irvine, California <span class="orange">✦</span></span><a href="#">Back to top ↑</a></div></footer>
+  </main>
+  <dialog id="work-dialog" class="work-dialog" aria-label="Experience details"><button class="close-button work-close" aria-label="Close experience">×</button><div class="selected-card-stage"></div></dialog>
+  <dialog id="project-dialog" class="project-dialog" aria-labelledby="project-modal-title"><button class="close-button" aria-label="Close project">×</button><div id="project-content"></div></dialog>
+  <noscript><p class="noscript">Please enable JavaScript to explore the experience cards and project boxes. Find my work on <a href="https://github.com/CrimTexFox">GitHub</a>.</p></noscript>
+</body>
+</html>

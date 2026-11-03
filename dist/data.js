@@ -1,0 +1,42 @@
+// Add an object to either array to create another card or project box.
+export const experiences = [
+  {company:'OpenAI',division:'Consumer Products',role:'Software Engineer Intern',dates:'Jun 2026 – Sep 2026',year:'2026',mark:'openai',suit:'♠',url:'https://openai.com',points:[
+    'Developed embedded and application software in C, Rust, and Python on Linux.',
+    'Worked on color spaces, ambient light sensing, and Raspberry Pi computer vision with OpenCV.',
+    'Built test dashboards and automated checks; investigated bugs and verified changes.',
+    'Used 3D printing for iterative prototypes and documented development workflows.'
+  ],tech:['C','Rust','Python','Linux','Raspberry Pi','OpenCV']},
+  {company:'Commissary Club',role:'Software Engineer Intern',dates:'Dec 2025 – Mar 2026',year:'2025',mark:'commissary',suit:'♦',url:'https://www.commissary.club',points:[
+    'Maintained and improved frontend and backend features for a platform helping people with criminal records find employment and housing.',
+    'Evaluated AI assistant efficiency and improved interactions, prompts, and data collection and delivery.'
+  ],tech:['Python','JavaScript','MySQL','Supabase']},
+  {company:'inCall.ai',role:'Software Engineer Intern',dates:'Mar 2024 – Jun 2024',year:'2024',mark:'incall',suit:'♣',url:'https://incall.ai',points:[
+    'Developed a platform connecting interactive AI agents with video conferencing.',
+    'Enabled a call bot to join Zoom meetings and interact with participants.',
+    'Integrated OpenAI, Microsoft Teams, and Zoom APIs.'
+  ],tech:['Python','OpenAI API','Microsoft Teams API','Zoom API']},
+  {company:'PCB BOM Recognition',role:'Software Engineer Intern',dates:'Oct 2023 – Dec 2023',year:'2023',mark:'pcb',suit:'♥',points:[
+    'Built a prototype to identify and extract text from motherboard images for PCB bill-of-materials mapping.',
+    'Trained image recognition models with Python, OCR, and open-source tools including ocrSpace and YOLOv8.'
+  ],tech:['Python','OCR','Computer vision','YOLOv8']},
+  {company:'SV Stem Lab',role:'Robotics Coach',dates:'Feb 2023 – Aug 2025',year:'2023',mark:'stem',suit:'♠',points:[
+    'Taught students robotics and programming with VEXcode and Python.',
+    'Formed and coached a middle school VEX IQ competition team that achieved top U.S. rankings in one season.'
+  ],tech:['VEX IQ','VEXcode','Python','Mentoring']}
+];
+export const projects = [
+  {id:'robot-arm',title:'AI Robotic Arm',kind:'Robotics · In development',theme:'robot',color:0xc78f4b,
+    description:'A four-axis robotic arm with a companion AI. I’m developing the software that lets it understand its surroundings and interact with people through machine learning and computer vision.',
+    points:['Computer vision with YOLO and OpenCV.','Persistent data and context for interactive companion behavior.','Built around Raspberry Pi and a Linux-based software stack.'],
+    tech:['Raspberry Pi','OpenCV','OpenAI Realtime API','Linux','Python','C','Rust'],links:[],media:[{type:'illustration',caption:'Illustration of the project’s hardware setup.'}]},
+  {id:'dont-hide',title:'Don’t Hide',kind:'Horror game · Published',theme:'horror',color:0x695743,
+    description:'An independent horror game I conceived, designed, developed, and published on Steam. Trapped in a maze with a creature, you have to find five keys and escape before it catches your scent.',
+    points:['Designed and built the game from concept through release.','More than 1,000 licenses granted.'],
+    tech:['Godot','Python','Aseprite','Audacity'],links:[{label:'Play on Steam',url:'https://store.steampowered.com/app/2131620/Dont_Hide/'}],
+    media:[{type:'image',src:'./assets/dont-hide-1.jpg',alt:'Don’t Hide gameplay screenshot from the Steam store'},{type:'image',src:'./assets/dont-hide-2.jpg',alt:'A dark maze in Don’t Hide'}]},
+  {id:'cat-rpg',title:'Cat RPG',kind:'3D game · Prototype',theme:'cat',color:0x9a6740,
+    description:'A 3D role-playing game prototype about escaping a city overrun by cats. I programmed and designed the game, collaborating with an artist on its world and visual direction.',
+    points:['Programmed the game systems and 3D prototype in Godot.','Collaborated with an artist on game design and development.'],
+    tech:['Godot','Python','Procreate','Audacity'],links:[{label:'Watch gameplay',url:'https://www.youtube.com/playlist?list=PLQBNQT2eutAddgxIImXf-Nu_gJPEx1dng'}],
+    media:[{type:'youtube-playlist',id:'PLQBNQT2eutAddgxIImXf-Nu_gJPEx1dng'}]}
+];
