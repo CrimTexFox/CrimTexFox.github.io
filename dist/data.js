@@ -38,7 +38,7 @@ export const projects = [
     description:'A 3D role-playing game prototype about escaping a city overrun by cats. I programmed and designed the game, collaborating with an artist on its world and visual direction.',
     points:['Programmed the game systems and 3D prototype in Godot.','Collaborated with an artist on game design and development.'],
     tech:['Godot','Python','Procreate','Audacity'],links:[{label:'Watch gameplay',url:'https://www.youtube.com/watch?v=WFFjuH0PtXI'}],
-    media:[{type:'youtube',id:'WFFjuH0PtXI'}]},
+    media:[{type:'youtube',id:'WFFjuH0PtXI',autoLoad:true}]},
   {id:'drawensic',title:'Drawensic',kind:'Drawing game · Website',theme:'drawensic',color:0xbb8b50,
     description:'A browser game where you draw a video game character from a written description, sign your artwork, and then discover who it was. A shared gallery lets you explore the community’s interpretations.',
     points:['Canvas drawing tools with brushes, fill, eraser, and undo/redo.','Signed artwork, framed downloads, and a shared community gallery.'],
