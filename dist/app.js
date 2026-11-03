@@ -2,7 +2,7 @@ import {experiences,projects,skills} from './data.js?v=20261103-cards2';
 import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
 import {SkillField} from './skills.js?v=20261103-skills-drift';
 import {SpaceBackground} from './space-background.js?v=20261103-parallax';
-import {wheelIdleMotion,cardFanMotion} from './wheel-motion.js?v=20261103-cards2';
+import {wheelIdleMotion,cardFanMotion,visibleFanOrder,FAN_PERIOD} from './wheel-motion.js?v=20261103-card-wave';
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
 document.querySelector('#year').textContent=new Date().getFullYear();
@@ -51,7 +51,7 @@ export class CardWheel {
   constructor(container,data){
     this.container=container;this.holder=container.querySelector('.card-holder');this.stage=container.querySelector('.wheel-stage');
     this.rotation=0;this.target=0;this.velocity=0;this.drag=null;this.frame=null;this.lastDrag=-1000;this.lastInteraction=performance.now();
-    this.idleAngle=0;this.idleShift=0;this.idleFan=0;this.idleClock=0;this.wasIdle=false;this.hovered=false;this.inView=false;
+    this.idleAngle=0;this.idleShift=0;this.idleFan=0;this.idleClock=0;this.fanCycle=-1;this.fanOrder=[];this.wasIdle=false;this.hovered=false;this.inView=false;
     this.cards=data.map((d,i)=>new WorkCard(d,i,card=>{if(performance.now()-this.lastDrag>220)openWork(card);}));
     this.cards.forEach(c=>this.holder.append(c.button));
     this.previous=document.querySelector('#previous');this.next=document.querySelector('#next');this.status=document.querySelector('#wheel-position');
@@ -69,7 +69,7 @@ export class CardWheel {
     container.addEventListener('pointerenter',()=>{this.hovered=true;this.lastInteraction=performance.now();});
     container.addEventListener('pointerleave',()=>{this.hovered=false;this.lastInteraction=performance.now();});
     container.addEventListener('focusin',()=>{this.lastInteraction=performance.now();});
-    new ResizeObserver(()=>this.render()).observe(container);
+    new ResizeObserver(()=>{this.fanCycle=-1;this.render();}).observe(container);
     new IntersectionObserver(entries=>{this.inView=entries[0].isIntersecting;if(this.inView)this.animate();},{rootMargin:'100px'}).observe(container);
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.animate();});
     this.render();this.updateStatus();
@@ -125,7 +125,7 @@ export class CardWheel {
       const idle=!reducedMotion&&!this.drag&&!this.hovered&&!this.container.matches(':focus-within')&&!document.querySelector('dialog[open]')&&now-this.lastInteraction>4500;
       const width=this.container.clientWidth,mobile=matchMedia('(max-width: 600px)').matches;
       const allFit=cardsFitFrame(this.cards.length,this.rotation,{width,height:this.container.clientHeight,cardWidth:mobile?151:176,cardHeight:mobile?217:248,centerY:mobile?434:454});
-      if(idle){if(!this.wasIdle)this.idleClock=0;this.idleClock+=dt*1000;}
+      if(idle){if(!this.wasIdle){this.idleClock=0;this.fanCycle=-1;}this.idleClock+=dt*1000;}
       this.wasIdle=idle;
       const motion=wheelIdleMotion(this.idleClock,width,allFit);
       const ease=1-Math.exp(-dt*2);
@@ -145,8 +145,14 @@ export class CardWheel {
   render(){
     const mobile=matchMedia('(max-width: 600px)').matches,centerY=mobile?434:454,cardWidth=mobile?151:176,cardHeight=mobile?217:248;
     this.stage.style.transform=`translateX(${this.idleShift}px)`;
+    const positions=this.cards.map((_,index)=>({...cardPosition(index,this.rotation+this.idleAngle),index}));
+    const cycle=Math.floor(this.idleClock/FAN_PERIOD);
+    if(cycle!==this.fanCycle){
+      this.fanOrder=visibleFanOrder(positions,{width:this.container.clientWidth,height:this.container.clientHeight,cardWidth,cardHeight,centerY,shift:this.idleShift});
+      this.fanCycle=cycle;
+    }
     this.cards.forEach((c,i)=>{
-      const base=cardPosition(i,this.rotation+this.idleAngle),fan=cardFanMotion(this.idleClock,base.angle,this.idleFan);
+      const base=positions[i],fan=cardFanMotion(this.idleClock,base.angle,this.idleFan,this.fanOrder.indexOf(i));
       const p=cardPosition(i,this.rotation+this.idleAngle+fan.spread);
       c.button.style.transform=`translate(${p.x-cardWidth/2}px,${centerY+p.y-cardHeight/2}px) rotate(${p.angle}deg) scale(${fan.scale})`;
       c.button.style.zIndex=String(Math.round(200-Math.abs(p.angle)));
