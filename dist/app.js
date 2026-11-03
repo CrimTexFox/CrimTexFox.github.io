@@ -196,9 +196,9 @@ function openProject(project,box){
       const img=element('img');img.src=media.src;img.alt=media.alt;img.loading='lazy';gallery.append(img);
     }else if(media.type==='video'){
       const video=element('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.src=media.src;if(media.poster)video.poster=media.poster;gallery.append(video);
-    }else if(media.type==='youtube-playlist'){
+    }else if(media.type==='youtube'||media.type==='youtube-playlist'){
       const button=element('button','video-load');button.append(element('strong','','▷  Watch gameplay'),element('span','','Load YouTube player'));
-      button.addEventListener('click',()=>{const frame=element('iframe');frame.title='Cat RPG gameplay videos';frame.src=`https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(media.id)}`;frame.allow='fullscreen; picture-in-picture';frame.allowFullscreen=true;gallery.replaceChild(frame,button);});gallery.append(button);
+      button.addEventListener('click',()=>{const frame=element('iframe');frame.title=`${project.title} gameplay`;const path=media.type==='youtube-playlist'?`videoseries?list=${encodeURIComponent(media.id)}`:encodeURIComponent(media.id);frame.src=`https://www.youtube-nocookie.com/embed/${path}`;frame.allow='fullscreen; picture-in-picture';frame.allowFullscreen=true;gallery.replaceChild(frame,button);});gallery.append(button);
     }else if(media.type==='illustration'){
       const figure=element('figure'),img=element('img','robot-illustration');img.src='./assets/robot-setup.svg';img.alt='Illustrated four-axis robotic arm, Raspberry Pi, breadboard, and wires';figure.append(img,element('figcaption','',media.caption));gallery.append(figure);
     }
