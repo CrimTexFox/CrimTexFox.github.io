@@ -1,4 +1,4 @@
-import {experiences,projects,skills} from './data.js?v=20261103-robot-timeline';
+import {experiences,projects,skills} from './data.js?v=20261103-box-photos';
 import {ProjectGallery} from './project-gallery.js?v=20261103-robot-gallery';
 import {CARD_SPACING,WHEEL_RADIUS,clamp,cardSlot,rotationBounds,limitRotation,resistedRotation,cardPosition,cardsFitFrame,springStep} from './wheel-math.js';
 import {SkillField} from './skills.js?v=20261103-skills-bounce';
@@ -261,7 +261,7 @@ new SpaceBackground(document.querySelector('#stars'));
 // Content remains navigable if a browser cannot create a WebGL context.
 await document.fonts.ready;
 try {
-  const {ProjectBox}=await import('./project-box.js');
+  const {ProjectBox}=await import('./project-box.js?v=20261103-box-photos');
   projects.forEach(project=>new ProjectBox(document.querySelector('#project-grid'),project,(box)=>openProject(project,box),reducedMotion));
 }catch(error){
   console.warn('3D rendering unavailable; using project fallback.',error);

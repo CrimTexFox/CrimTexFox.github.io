@@ -25,7 +25,7 @@ export const experiences = [
   ],tech:['VEX IQ','VEXcode','Python','Mentoring']}
 ];
 export const projects = [
-  {id:'robot-arm',title:'AI Robotic Arm',kind:'Robotics · Early development',theme:'robot',color:0xc78f4b,
+  {id:'robot-arm',title:'AI Robotic Arm',kind:'Robotics · Early development',theme:'robot',color:0xc78f4b,boxImage:'./assets/box-photos/robot-arm.webp',
     description:'An early-stage project exploring a four-axis robotic arm with a companion AI. I’m currently studying and planning the base OS and foundational software design.',
     points:['Long-term direction: computer vision and context-aware companion behavior on Raspberry Pi.'],
     timeline:[
@@ -41,17 +41,17 @@ export const projects = [
       {type:'image',src:'./assets/robot-arm/displays.webp',alt:'Companion face display and camera dashboard during development'},
       {type:'video',src:'./assets/robot-arm/demo.mp4',poster:'./assets/robot-arm/demo-poster.jpg',alt:'Robot arm demonstration'}
     ]},
-  {id:'dont-hide',title:'Don’t Hide',kind:'Horror game · Published',theme:'horror',color:0x695743,
+  {id:'dont-hide',title:'Don’t Hide',kind:'Horror game · Published',theme:'horror',color:0x695743,boxImage:'./assets/box-photos/dont-hide.webp',
     description:'An independent horror game I conceived, designed, developed, and published on Steam. Trapped in a maze with a creature, you have to find five keys and escape before it catches your scent.',
     points:['Designed and built the game from concept through release.','More than 1,000 licenses granted.'],
     tech:['Godot','Python','Aseprite','Audacity'],links:[{label:'Play on Steam',url:'https://store.steampowered.com/app/2131620/Dont_Hide/'}],
     media:[{type:'image',src:'./assets/dont-hide-1.jpg',alt:'Don’t Hide gameplay screenshot from the Steam store'},{type:'image',src:'./assets/dont-hide-2.jpg',alt:'A dark maze in Don’t Hide'}]},
-  {id:'cat-rpg',title:'Cat RPG',kind:'3D game · Prototype',theme:'cat',color:0x9a6740,
+  {id:'cat-rpg',title:'Cat RPG',kind:'3D game · Prototype',theme:'cat',color:0x9a6740,boxImage:'./assets/box-photos/cat-rpg.webp',
     description:'A 3D role-playing game prototype about escaping a city overrun by cats. I programmed and designed the game, collaborating with an artist on its world and visual direction.',
     points:['Programmed the game systems and 3D prototype in Godot.','Collaborated with an artist on game design and development.'],
     tech:['Godot','Python','Procreate','Audacity'],links:[{label:'Watch gameplay',url:'https://www.youtube.com/watch?v=WFFjuH0PtXI'}],
     media:[{type:'youtube',id:'WFFjuH0PtXI',autoLoad:true}]},
-  {id:'drawensic',title:'Drawensic',kind:'Drawing game · Website',theme:'drawensic',color:0xbb8b50,
+  {id:'drawensic',title:'Drawensic',kind:'Drawing game · Website',theme:'drawensic',color:0xbb8b50,boxImage:'./assets/box-photos/drawensic.webp',
     description:'A browser game where you draw a video game character from a written description, sign your artwork, and then discover who it was. A shared gallery lets you explore the community’s interpretations.',
     points:['Canvas drawing tools with brushes, fill, eraser, and undo/redo.','Signed artwork, framed downloads, and a shared community gallery.'],
     tech:['JavaScript','HTML Canvas','Node.js','Cloudflare Workers','D1','R2'],

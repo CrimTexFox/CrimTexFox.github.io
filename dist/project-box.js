@@ -140,6 +140,7 @@ export class ProjectBox {
     const box=new THREE.Group();this.group.add(box);box.position.set(0,.1,0);
     const labelMat=new THREE.MeshStandardMaterial({map:labelTexture(this.project),roughness:.92});
     buildBoxShell(box,{cardboard,inside,front:labelMat});
+    this.addSidePhoto(box);
     // Lid geometry is hinged to the rear edge, not translated out of the box.
     this.hinge=new THREE.Group();this.hinge.position.set(0,1.12,-.79);box.add(this.hinge);
     cube(this.hinge,[2.08,.095,1.64],[0,.02,.8],cardboard);
@@ -155,6 +156,17 @@ export class ProjectBox {
       drawingTablet(this.group);const pad=controller(this.group,1.12,.95,0xc8c4b8);pad.scale.setScalar(.65);
     }else{controller(this.group,-.85,1.05,0xc8c4b8);cat(this.group);}
     this.resize();
+  }
+  addSidePhoto(box){
+    if(!this.project.boxImage)return;
+    new THREE.TextureLoader().load(this.project.boxImage,texture=>{
+      texture.colorSpace=THREE.SRGBColorSpace;
+      texture.anisotropy=Math.min(8,this.renderer.capabilities.getMaxAnisotropy());
+      const material=new THREE.MeshBasicMaterial({map:texture,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});
+      // The right wall ends at x=1. Keep the photo outside it to avoid z-fighting.
+      this.sidePhoto=mesh(new THREE.PlaneGeometry(.9,.6),material,box,1.008,.59,0);
+      this.sidePhoto.rotation.y=Math.PI/2;this.render();
+    },undefined,()=>console.warn(`Could not load box photo for ${this.project.title}`));
   }
   resize(){
     if(!this.renderer)return;const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;
