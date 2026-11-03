@@ -198,7 +198,7 @@ async function closeWork(){
     workDialog.classList.add('is-closing');
     const flip=stage.firstElementChild;
     flip.classList.remove('is-flipped');
-    closingAnimation=stage.animate([{transform:from},{transform:destination}],{duration:620,easing:'cubic-bezier(.8,0,.82,.2)',fill:'forwards'});
+    closingAnimation=stage.animate([{transform:from},{transform:destination}],{duration:500,easing:'cubic-bezier(.8,0,.82,.2)',fill:'forwards'});
     await closingAnimation.finished;
   }
   workDialog.close();closingAnimation?.cancel();workDialog.classList.remove('is-closing');markModal(false);
