@@ -1,4 +1,7 @@
 /* Interaction and layout additions. Theme tokens remain in styles.css. */
+/* The wheel extends beyond the screen; clip the page without cropping card lifts. */
+html{overflow-x:hidden;overscroll-behavior-x:none}
+@supports(overflow:clip){html,body{overflow-x:clip}}
 .projects{padding-top:24px}
 .experience{padding-top:100px}
 .wheel{height:520px;overflow:visible;clip-path:inset(-64px -30px 0);z-index:3}
