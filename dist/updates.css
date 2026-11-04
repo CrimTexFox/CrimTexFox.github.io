@@ -7,6 +7,7 @@
 .journey-label>span{color:var(--orange);font-size:11px;letter-spacing:.5px}
 .skills{padding-top:80px}
 .art{padding-top:100px}
+.art-aside{display:block;font-size:12px;letter-spacing:.5px;white-space:nowrap}
 .art-stack{position:relative;width:100%;margin-top:24px;isolation:isolate;touch-action:pan-y}
 .art-card{position:absolute;display:block;padding:clamp(5px,1vw,10px);border:2px solid #eee8dc;border-radius:4px;color:var(--white);cursor:pointer;box-shadow:0 16px 42px #0008;transform-origin:center;will-change:transform;transition:transform .52s cubic-bezier(.22,1,.36,1),border-color .2s,box-shadow .25s}
 .art-card img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
