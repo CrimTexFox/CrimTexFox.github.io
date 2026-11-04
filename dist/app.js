@@ -61,7 +61,8 @@ export class CardWheel {
     container.addEventListener('pointerdown',e=>this.start(e));
     container.addEventListener('pointermove',e=>this.move(e));
     container.addEventListener('pointerup',e=>this.end(e));container.addEventListener('pointercancel',e=>this.end(e,true));
-    container.addEventListener('lostpointercapture',e=>this.end(e,true));
+    // Touch capture starts on the card; its loss bubbles when the wheel takes over.
+    container.addEventListener('lostpointercapture',e=>{if(e.target===container)this.end(e,true);});
     container.addEventListener('keydown',e=>{
       if(['ArrowRight','ArrowLeft','Home','End'].includes(e.key)){
         e.preventDefault();
