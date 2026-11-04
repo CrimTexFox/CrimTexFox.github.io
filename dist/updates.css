@@ -7,7 +7,10 @@
 .journey-label>span{color:var(--orange);font-size:11px;letter-spacing:.5px}
 .skills{padding-top:80px}
 .art{padding-top:100px}
-.art-aside{display:block;font-size:12px;letter-spacing:.5px;white-space:nowrap}
+.art .section-no{flex-shrink:0;white-space:nowrap}
+.art .section-heading h2{flex-shrink:0}
+.art-aside{display:block;min-width:0;font-size:clamp(17px,2vw,22px);color:var(--orange);letter-spacing:.5px;line-height:1.25;text-align:right}
+.art-caption{max-width:680px;margin:12px auto 0;text-align:center;font-size:clamp(16px,1.6vw,18px);line-height:1.65;color:var(--white)}
 .art-stack{position:relative;width:100%;margin-top:24px;isolation:isolate;touch-action:pan-y}
 .art-card{position:absolute;display:block;padding:clamp(5px,1vw,10px);border:2px solid #eee8dc;border-radius:4px;color:var(--white);cursor:pointer;box-shadow:0 16px 42px #0008;transform-origin:center;will-change:transform;transition:transform .52s cubic-bezier(.22,1,.36,1),border-color .2s,box-shadow .25s}
 .art-card img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
