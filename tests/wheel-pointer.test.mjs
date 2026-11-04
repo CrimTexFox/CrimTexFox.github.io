@@ -68,6 +68,17 @@ test('losing the wheel capture itself still cancels and settles the drag',()=>{
   assert.equal(classes.has('dragging'),false);
 });
 
+test('company logos cannot start a native image drag and interrupt the wheel',()=>{
+  const {wheel,send}=fixture();
+  let prevented=false;
+  send('pointerdown');
+  send('dragstart',{target:wheel.cards[0].button,preventDefault:()=>{prevented=true;}});
+  assert.equal(prevented,true);
+  send('pointermove',{clientX:80,timeStamp:100});
+  assert.ok(wheel.drag);
+  assert.ok(wheel.rotation<0);
+});
+
 test('vertical touch movement remains available for scrolling the page',()=>{
   const {wheel,container,classes,send}=fixture();
   send('pointerdown');

@@ -59,6 +59,7 @@ export class CardWheel {
     this.previous=document.querySelector('#previous');this.next=document.querySelector('#next');this.status=document.querySelector('#wheel-position');
     this.previous.addEventListener('click',()=>this.go(-1));this.next.addEventListener('click',()=>this.go(1));
     container.addEventListener('pointerdown',e=>this.start(e));
+    container.addEventListener('dragstart',e=>e.preventDefault());
     container.addEventListener('pointermove',e=>this.move(e));
     container.addEventListener('pointerup',e=>this.end(e));container.addEventListener('pointercancel',e=>this.end(e,true));
     // Touch capture starts on the card; its loss bubbles when the wheel takes over.
